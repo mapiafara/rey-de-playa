@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Torneo Rey de la Playa - Sistema Oficial</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="header-container">
+      <a href="#" class="logo">
+        <span class="logo-icon">👑</span>
+        <div class="logo-text">
+          <span class="logo-title">Rey de la Playa</span>
+          <span class="logo-subtitle">Voley Playa System</span>
+        </div>
+      </a>
+      <div class="header-actions">
+        <span id="syncBadge" class="sync-badge-online" title="Sincronización en vivo con la nube">🟢 En vivo</span>
+        <span id="modeBadge" class="mode-badge-view">👁️ Lectura</span>
+        <button class="btn-icon admin-only" id="btnSyncCloud" title="Forzar Sincronización con la Nube">☁️</button>
+        <button class="btn-icon admin-only" id="btnCopyReadonlyLink" title="Copiar Link de Lectura (Para Jugadores)">🔗</button>
+        <button class="btn-icon admin-only" id="btnExport" title="Exportar / Respaldar Datos">💾</button>
+        <button class="btn-icon admin-only" id="btnImport" title="Importar Datos">📂</button>
+        <button class="btn-icon admin-only" id="btnReset" title="Reiniciar Torneo">🔄</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs-container">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-players">👥 Jugadores</button>
+      <button class="nav-tab" data-tab="tab-round1">🏐 Ronda 1</button>
+      <button class="nav-tab" data-tab="tab-round2">🔄 Ronda 2</button>
+      <button class="nav-tab" data-tab="tab-leaderboard">📊 Tabla General</button>
+      <button class="nav-tab" data-tab="tab-bracket-male">👨 Elim. Hombres</button>
+      <button class="nav-tab" data-tab="tab-bracket-female">👩 Elim. Mujeres</button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- TAB 1: JUGADORES -->
+    <section id="tab-players" class="tab-content active">
+      <div class="card">
+        <div class="card-title">
+          <span>Configuración de Participantes (12 Jugadores)</span>
+          <span class="icon-badge">6 Masculinos + 6 Femeninos</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Ingresa o ajusta los nombres de los jugadores. Se organizarán en grupos mixtos (2 hombres y 2 mujeres por grupo) para las Rondas 1 y 2.
+        </p>
+
+        <div class="grid-2">
+          <!-- Categoria Masculina -->
+          <div>
+            <div class="players-category-header male">
+              <span>👨 Categoría Masculina</span>
+            </div>
+            <div id="male-inputs-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Categoria Femenina -->
+          <div>
+            <div class="players-category-header female">
+              <span>👩 Categoría Femenina</span>
+            </div>
+            <div id="female-inputs-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-only" style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+          <div class="card-title" style="font-size: 15px;">
+            <span>Modo de Creación de Grupos para Ronda 1</span>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+            <button class="btn btn-primary" id="btnSavePlayers">
+              <span>🎲 Generar Automático (Ronda 1)</span>
+            </button>
+            <button class="btn btn-secondary" id="btnToggleManualGroups">
+              <span>✏️ Asignar Grupos Manualmente</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Group Assignment Panel (Hidden by default) -->
+        <div id="manual-groups-panel" class="admin-only" style="display: none; margin-top: 20px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px;">
+          <h4 style="font-size: 15px; color: var(--secondary); margin-bottom: 12px;">Asignación Manual de Grupos (2 Hombres + 2 Mujeres por Grupo)</h4>
+          <div id="manual-groups-selectors" class="grid-3">
+            <!-- Dynamically rendered selectors -->
+          </div>
+          <div style="margin-top: 16px; text-align: right;">
+            <button class="btn btn-accent" id="btnSaveManualGroups">
+              <span>Guardar Grupos Manuales & Iniciar Ronda 1</span> ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: RONDA 1 -->
+    <section id="tab-round1" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Ronda 1 - Grupos Mixtos</span>
+          <span class="icon-badge">Set a 21 pts sin alargue</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Ingresa los marcadores de los 3 partidos por grupo (J1+J2 vs J3+J4, J1+J3 vs J2+J4, J1+J4 vs J2+J3).
+        </p>
+      </div>
+
+      <div id="round1-groups-container" class="grid-3">
+        <!-- Groups 1, 2, 3 rendered dynamically -->
+      </div>
+
+      <div class="admin-only" style="margin-top: 24px; text-align: right;">
+        <button class="btn btn-accent" id="btnAdvanceToRound2">
+          <span>Generar Grupos Ronda 2 (Con Ranqueo R1)</span> ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 3: RONDA 2 -->
+    <section id="tab-round2" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Ronda 2 - Grupos Mixtos (Según Ranqueo R1)</span>
+          <span class="icon-badge">Siembra Optimizada Sin Repetir Integrantes</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Distribuidos por ranqueo (F1 en G1, F2 en G2, F3 en G3; M1 en G3, M2 en G2, M3 en G1) ajustando automáticamente para evitar repetir compañeros de la Ronda 1.
+        </p>
+      </div>
+
+      <div id="round2-groups-container" class="grid-3">
+        <!-- Groups rendered dynamically -->
+      </div>
+
+      <div style="margin-top: 24px; text-align: right;">
+        <button class="btn btn-primary" id="btnCalculateLeaderboard">
+          <span>Ver Tabla General Acumulada</span> 📊
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 4: TABLA GENERAL -->
+    <section id="tab-leaderboard" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Tabla General Acumulada (Desglose Ronda 1, Ronda 2 y Total)</span>
+          <span class="icon-badge">Criterios de Desempate Oficiales</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          Clasificación oficial diferenciando los marcadores de Ronda 1, Ronda 2 y Total Acumulado. <strong>Puestos 1º y 2º pasan directo a Semifinales</strong>. Puestos <strong>3º a 6º juegan Cuartos de Final</strong>.
+        </p>
+
+        <div class="grid-2">
+          <!-- Ranking Masculino -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="color: var(--male-color); font-size: 16px; margin: 0;">👨 Ranqueo Masculino</h3>
+              <button class="btn btn-secondary btn-sm admin-only" id="btnRandomDrawMale" title="Sortear empates totales aleatoriamente">🎲 Sortear Empates</button>
+            </div>
+            <div class="table-responsive">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Pos</th>
+                    <th>Jugador</th>
+                    <th>Ronda 1<br><small>(PG / DIF / PF)</small></th>
+                    <th>Ronda 2<br><small>(PG / DIF / PF)</small></th>
+                    <th>TOTAL<br><small>(PG / DIF / PF)</small></th>
+                    <th>Pase</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-male-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Ranking Femenino -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="color: var(--female-color); font-size: 16px; margin: 0;">👩 Ranqueo Femenino</h3>
+              <button class="btn btn-secondary btn-sm admin-only" id="btnRandomDrawFemale" title="Sortear empates totales aleatoriamente">🎲 Sortear Empates</button>
+            </div>
+            <div class="table-responsive">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Pos</th>
+                    <th>Jugador</th>
+                    <th>Ronda 1<br><small>(PG / DIF / PF)</small></th>
+                    <th>Ronda 2<br><small>(PG / DIF / PF)</small></th>
+                    <th>TOTAL<br><small>(PG / DIF / PF)</small></th>
+                    <th>Pase</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-female-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btnGoToBracketMale">
+            <span>👨 Elim. Hombres</span> 🏆
+          </button>
+          <button class="btn btn-secondary" id="btnGoToBracketFemale">
+            <span>👩 Elim. Mujeres</span> 👑
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ELIMINATORIAS HOMBRES -->
+    <section id="tab-bracket-male" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>👨 Eliminatorias Masculinas (Rey de la Playa)</span>
+          <span class="icon-badge">Categoría Masculina</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          En las eliminatorias mixtas (Cuartos y Semis), los jugadores masculinos escogen parejas femeninas con las que <strong>no hayan jugado previamente en las eliminatorias</strong>. En la Gran Final se juega con pareja masculina.
+        </p>
+        <div class="admin-only" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+          <button class="btn btn-secondary" id="btnResetMaleQF">🗑️ Borrar Elecciones Cuartos</button>
+          <button class="btn btn-secondary" id="btnResetMaleSF">🗑️ Borrar Elecciones Semis</button>
+        </div>
+      </div>
+
+      <!-- Cuartos de Final Masculino -->
+      <div class="bracket-stage-title">🔥 Cuartos de Final Masculinos (Mixtos)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Compiten los puestos 3, 4, 5 y 6 de la tabla masculina eligiendo pareja femenina del grupo de cuartos. El último jugador queda con la pareja restante automáticamente.
+      </p>
+      <div id="qf-male-matches-container" class="grid-2">
+        <!-- Male QF Matches rendered dynamically -->
+      </div>
+
+      <!-- Semifinales Masculino -->
+      <div class="bracket-stage-title" style="margin-top: 30px;">⚡ Semifinales Masculinas (Mixtas)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Puestos 1 y 2 directos masculinos eligen pareja femenina + ganadores masculinos de Cuartos.
+      </p>
+      <div id="sf-male-matches-container" class="grid-2">
+        <!-- Male SF Matches rendered dynamically -->
+      </div>
+
+      <!-- Final Masculino -->
+      <div class="bracket-stage-title" style="margin-top: 30px;">👑 Gran Final Masculina (Mismo Género)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Los 2 finalistas masculinos eligen a su pareja masculina para definir al Rey de la Playa.
+      </p>
+      <div id="final-male-matches-container" class="grid-2">
+        <!-- Male Final Match rendered dynamically -->
+      </div>
+
+      <!-- Winner Crown Banner Male -->
+      <div id="male-winner-banner-container">
+        <!-- Rendered when Final score is completed -->
+      </div>
+    </section>
+
+    <!-- TAB 6: ELIMINATORIAS MUJERES -->
+    <section id="tab-bracket-female" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>👩 Eliminatorias Femeninas (Reina de la Playa)</span>
+          <span class="icon-badge" style="background: rgba(236, 64, 122, 0.2); color: var(--female-color);">Categoría Femenina</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+          En las eliminatorias mixtas (Cuartos y Semis), las jugadoras femeninas escogen parejas masculinas con las que <strong>no hayan jugado previamente en las eliminatorias</strong>. En la Gran Final se juega con pareja femenina.
+        </p>
+        <div class="admin-only" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px;">
+          <button class="btn btn-secondary" id="btnResetFemaleQF">🗑️ Borrar Elecciones Cuartos</button>
+          <button class="btn btn-secondary" id="btnResetFemaleSF">🗑️ Borrar Elecciones Semis</button>
+        </div>
+      </div>
+
+      <!-- Cuartos de Final Femenino -->
+      <div class="bracket-stage-title">🔥 Cuartos de Final Femeninos (Mixtos)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Compiten las posiciones 3, 4, 5 y 6 de la tabla femenina eligiendo pareja masculina del grupo de cuartos. La última jugadora queda con el jugador restante automáticamente.
+      </p>
+      <div id="qf-female-matches-container" class="grid-2">
+        <!-- Female QF Matches rendered dynamically -->
+      </div>
+
+      <!-- Semifinales Femenino -->
+      <div class="bracket-stage-title" style="margin-top: 30px;">⚡ Semifinales Femeninas (Mixtas)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Puestos 1 y 2 directos femeninos eligen pareja masculina + ganadoras femeninas de Cuartos.
+      </p>
+      <div id="sf-female-matches-container" class="grid-2">
+        <!-- Female SF Matches rendered dynamically -->
+      </div>
+
+      <!-- Final Femenino -->
+      <div class="bracket-stage-title" style="margin-top: 30px;">👑 Gran Final Femenina (Mismo Género)</div>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+        Las 2 finalistas femeninas eligen a su pareja femenina para definir a la Reina de la Playa.
+      </p>
+      <div id="final-female-matches-container" class="grid-2">
+        <!-- Female Final Match rendered dynamically -->
+      </div>
+
+      <!-- Winner Crown Banner Female -->
+      <div id="female-winner-banner-container">
+        <!-- Rendered when Final score is completed -->
+      </div>
+    </section>
+
+  </main>
+
+  <input type="file" id="importFileInput" accept=".json" style="display: none;">
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>
